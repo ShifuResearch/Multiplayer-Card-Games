@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0f0c29;
+  --foreground: #ededed;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --primary: #f59e0b;
+  /* Amber 500 */
+  --secondary: #ec4899;
+  /* Pink 500 */
+  --accent: #6366f1;
+  /* Indigo 500 */
+}
+
+body {
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .glass-panel {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-gradient {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
