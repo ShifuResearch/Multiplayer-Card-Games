@@ -175,11 +175,12 @@ export class RoomManager {
         }
     }
 
-    private createRoom(socket: Socket, data: { gameId: string }) {
+    private createRoom(socket: Socket, data: { gameId: string, playerName?: string }) {
         const roomCode = this.generateRoomCode();
 
         const playerNames = new Map<string, string>();
-        playerNames.set(socket.id, DEV_NAMES[0]);
+        const name = data.playerName || DEV_NAMES[0];
+        playerNames.set(socket.id, name);
 
         this.rooms.set(roomCode, {
             id: roomCode,
@@ -192,20 +193,20 @@ export class RoomManager {
 
         socket.emit('room-created', { roomCode });
         // Also emit initial player list
-        socket.emit('update-players', [{ id: socket.id, name: DEV_NAMES[0] }]);
+        socket.emit('update-players', [{ id: socket.id, name }]);
     }
 
-    private joinRoom(socket: Socket, data: { roomCode: string }) {
-        const { roomCode } = data;
+    private joinRoom(socket: Socket, data: { roomCode: string, playerName?: string }) {
+        const { roomCode, playerName } = data;
         const room = this.rooms.get(roomCode);
 
         if (room) {
             if (!room.players.includes(socket.id)) {
                 room.players.push(socket.id);
-                // Assign next available name
+                // Use provided name or assign next available DEV_NAME
                 const usedNames = Array.from(room.playerNames.values());
-                const availableName = DEV_NAMES.find(n => !usedNames.includes(n)) || `Player ${room.players.length}`;
-                room.playerNames.set(socket.id, availableName);
+                const name = playerName || DEV_NAMES.find(n => !usedNames.includes(n)) || `Player ${room.players.length}`;
+                room.playerNames.set(socket.id, name);
             }
             socket.join(roomCode);
 
