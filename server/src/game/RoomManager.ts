@@ -191,6 +191,9 @@ export class RoomManager {
 
         socket.join(roomCode); // Critical: Creator must join the room channel!
 
+        console.log(`Room created: ${roomCode} by ${name} (${socket.id})`);
+        console.log(`Total rooms: ${this.rooms.size}`);
+
         socket.emit('room-created', { roomCode });
         // Also emit initial player list
         socket.emit('update-players', [{ id: socket.id, name }]);
@@ -198,6 +201,9 @@ export class RoomManager {
 
     private joinRoom(socket: Socket, data: { roomCode: string, playerName?: string }) {
         const { roomCode, playerName } = data;
+        console.log(`Attempting to join room: ${roomCode} by ${playerName} (${socket.id})`);
+        console.log(`Available rooms: ${Array.from(this.rooms.keys()).join(', ')}`);
+
         const room = this.rooms.get(roomCode);
 
         if (room) {
@@ -210,12 +216,14 @@ export class RoomManager {
             }
             socket.join(roomCode);
 
+            console.log(`Player ${playerName} joined room ${roomCode}`);
             socket.emit('room-joined', { roomCode });
 
             // BROADCAST full list to everyone in room (including sender)
             const playersList = room.players.map(id => ({ id, name: room.playerNames.get(id) || 'Unknown' }));
             this.io.to(roomCode).emit('update-players', playersList);
         } else {
+            console.log(`Room ${roomCode} not found!`);
             socket.emit('error', { message: 'Room not found' });
         }
     }
